@@ -1,0 +1,52 @@
+# Based on: https://github.com/yhatt/marp-cli-example/blob/da954e14354bc4b37891cce6998c5ec50f7eb2c9/.github/workflows/github-pages.yml
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+          node-version: 20.11.1
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Build Dir
+        run: mkdir -p public
+
+      - name: Build RSS Feed
+        run: npx marss blog.md public/rss.xml public/index.html
+
+      - name: Upload page artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
