@@ -1,0 +1,5 @@
+Author=Mariah A. Knowles
+Description=Nice and Complex
+InputFolder=posts/
+OutputFile=public/rss.xml
+Link=https://snotskie.com

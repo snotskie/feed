@@ -25,22 +25,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - name: Install Go
+        uses: actions/setup-go@v5
         with:
-          cache: npm
-          node-version: 20.11.1
-          cache-dependency-path: package-lock.json
+          go-version: '>=1.25.0'
 
       - name: Install dependencies
-        run: npm install
+        run: GOBIN=`pwd` go install github.com/TimoKats/mdrss@latest
 
       - name: Setup Build Dir
         run: mkdir -p public
 
+      - name: Fix Timestamps
+        run: sh timefix.sh
+
       - name: Build RSS Feed
-        run: npx marss blog.md public/rss.xml public/index.html
+        run: ./mdrss --config .mdrss update
 
       - name: Upload page artifacts
         uses: actions/upload-pages-artifact@v3
